@@ -1,0 +1,8 @@
+# Dependencies
+/node_modules
+
+# Rest client queries
+/requests
+
+# Environment variables
+/.env
