@@ -1,5 +1,6 @@
 const info = (...params) => {
-    console.log(...params);
+    // Prevent logging from interfering with display of test results
+    process.env.NODE_ENV !== 'test' && console.log(...params);
 };
 
 const error = (...params) => {
