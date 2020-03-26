@@ -30,14 +30,14 @@ describe('Deleting a blog', () => {
         expect(ids).not.toContain(id);
     });
 
-    test('responds with 204 No Content for a non-existent id of valid format', async () => {
+    test('responds with 404 Not Found for a non-existent id of valid format', async () => {
         const id = await helper.nonExistentId();
 
         await api.delete(`/api/blogs/${id}`)
-            .expect(204);
+            .expect(404);
     });
 
-    test('responds with 204 No Content for an id of invalid format', async () => {
+    test('responds with 400 Bad Request for an id of invalid format', async () => {
         const id = '123465789';
 
         await api.delete(`/api/blogs/${id}`)
