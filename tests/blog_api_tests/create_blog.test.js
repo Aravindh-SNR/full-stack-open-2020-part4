@@ -6,6 +6,19 @@ const helper = require('../test_helper');
 
 const api = supertest(app);
 
+// Log in to get token
+beforeAll(async () => {
+    const user = {
+        username: 'root',
+        password: 'secret'
+    };
+
+    const response = await api.post('/api/login')
+        .send(user);
+
+    helper.token = `Bearer ${response.body.token}`;
+});
+
 // Delete all documents from db and create new documents before each test is run
 beforeEach(async () => {
     await Blog.deleteMany();
@@ -16,7 +29,7 @@ beforeEach(async () => {
 });
 
 describe('Creating a blog', () => {
-    test('saves new blog correctly to database', async () => {
+    test('with valid data and token saves new blog correctly to database', async () => {
         const newBlog = {
             title: 'Go To Statement Considered Harmful',
             author: 'Edsger W. Dijkstra',
@@ -25,6 +38,7 @@ describe('Creating a blog', () => {
         };
         
         await api.post('/api/blogs')
+            .set('Authorization', helper.token)
             .send(newBlog)
             .expect(201)
             .expect('Content-Type', /application\/json/);
@@ -44,9 +58,23 @@ describe('Creating a blog', () => {
         };
     
         const response = await api.post('/api/blogs')
+            .set('Authorization', helper.token)
             .send(newBlog);
     
         expect(response.body.likes).toBe(0);
+    });
+
+    test('fails with status code 401 Unauthorized if token is missing', async () => {
+        const newBlog = {
+            title: 'Go To Statement Considered Harmful',
+            author: 'Edsger W. Dijkstra',
+            url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
+            likes: 5
+        };
+        
+        await api.post('/api/blogs')
+            .send(newBlog)
+            .expect(401);
     });
 
     describe('responds with 400 Bad Request and does not create a new blog when', () => {
@@ -58,6 +86,7 @@ describe('Creating a blog', () => {
             };
         
             await api.post('/api/blogs')
+                .set('Authorization', helper.token)
                 .send(blogWithoutTitle)
                 .expect(400);
 
@@ -73,6 +102,7 @@ describe('Creating a blog', () => {
             };
         
             await api.post('/api/blogs')
+                .set('Authorization', helper.token)
                 .send(blogWithoutUrl)
                 .expect(400);
 
@@ -87,6 +117,7 @@ describe('Creating a blog', () => {
             };
         
             await api.post('/api/blogs')
+                .set('Authorization', helper.token)
                 .send(blogWithoutTitleAndUrl)
                 .expect(400);
 

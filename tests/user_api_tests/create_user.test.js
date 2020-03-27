@@ -70,7 +70,7 @@ describe('Creating a user', () => {
                 .expect(400)
                 .expect('Content-Type', /application\/json/);
 
-            expect(response.body.error).toContain('Password is required');
+            expect(response.body.error).toContain('Password must have at least 3 characters');
         
             const finalUsers = await helper.usersInDb();
             expect(finalUsers.length).toBe(initialUsers.length);
