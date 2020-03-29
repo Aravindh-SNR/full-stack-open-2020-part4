@@ -71,7 +71,8 @@ blogsRouter.delete('/:id', async (request, response) => {
 // Update a blog
 blogsRouter.put('/:id', async (request, response) => {
     const updatedBlog = await Blog
-        .findByIdAndUpdate(request.params.id, request.body, { new: true, runValidators: true });
+        .findByIdAndUpdate(request.params.id, request.body, { new: true, runValidators: true })
+        .populate('user', { blogs: 0 });
     updatedBlog ? response.json(updatedBlog) :
         response.status(404).json({ error: 'Blog with given id does not exist' });
 });
